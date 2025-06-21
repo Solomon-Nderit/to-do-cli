@@ -86,3 +86,33 @@ def complete(id):
    
     
     print(f"✅Marked  '{title}' as complete")
+
+import json
+
+def delete(task_id):
+    task_id = int(task_id)
+
+    try:
+        with open("tasks.json", "r") as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("❌ Could not load tasks.")
+        return
+
+    found = False
+    for index, task in enumerate(data):
+        if task["id"] == task_id:
+            title = task["title"]
+            del data[index]
+            found = True
+            break
+
+    if not found:
+        print(f"❌ Task with ID {task_id} not found.")
+        return
+
+    with open("tasks.json", "w") as f:
+        json.dump(data, f, indent=4)
+
+    print(f"✅ Deleted '{title}'")
+

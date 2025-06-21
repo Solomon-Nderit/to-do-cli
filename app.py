@@ -1,17 +1,20 @@
 import argparse
-from utils import load_tasks, save_tasks, complete
+from utils import load_tasks, save_tasks, complete, delete
 
 def main():
     parser = argparse.ArgumentParser(
         description="📝 A simple to-do CLI app"
     )
 
-    parser.add_argument("command", choices=["add", "list","complete"], help="Command to run")
+    parser.add_argument("command", choices=["add", "list","complete","delete"], help="Command to run")
 
     parser.add_argument("-t", "--title", help="Title of the task")
     parser.add_argument("-d", "--description", help="Description of the task")
     parser.add_argument("-dd", "--due_date", help="Due date in YYYY-MM-DD format")
     parser.add_argument("-c", "--complete", help="Mark tasks as complete by id.")
+    parser.add_argument("-del", "--delete", help="Delete tasks by ID")
+
+
 
     
 
@@ -27,6 +30,9 @@ def main():
     elif args.command == 'complete':
         if args.complete:
             complete(args.complete)
+    elif args.command == 'delete':
+        delete(args.delete)
+
 
 
 if __name__ == "__main__":
