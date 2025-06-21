@@ -10,7 +10,7 @@ def create_new_json():
             json.dump([], f, indent=4)
 
 create_new_json()
-def load_tasks():
+def read_tasks():
 
     with open('tasks.json') as f:
         data = json.load(f)
@@ -22,20 +22,44 @@ def generate_new_id(tasks):
     return max(task['id'] for task in tasks) + 1
 
 def save_tasks(title, description, due_date):
-    tasks = load_tasks()  
-    new_id = generate_new_id(tasks)
+    try:
+        tasks = read_tasks()  
+        new_id = generate_new_id(tasks)
+        
+        new_task = Task(new_id, title, description, due_date)
+        task_dict = new_task.to_dict()
+
+        tasks.append(task_dict) 
+
+        # Save full updated list back to file
+        with open('tasks.json', 'w') as f:
+            json.dump(tasks, f, indent=4)
+
+        print(f"✅ Saved '{title}' as task number {new_id}")
+    except Exception as e:
+        print(f"❌ Error saving task: {e}")
+    except json.JSONDecodeError:
+        print("❌ Error decoding JSON. Please check the tasks.json file.")
+    except FileNotFoundError:
+        print("❌ tasks.json file not found. Please create it first.")
+        create_new_json()
+    return
+
+def load_tasks():
+    try:
+        with open("tasks.json", "r") as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("No tasks found")
+        return
+
+    if not data:
+        print("No tasks to show.")
+        return
     
-    new_task = Task(new_id, title, description, due_date)
-    task_dict = new_task.to_dict()
-
-    tasks.append(task_dict) 
-
-    # Save full updated list back to file
-    with open('tasks.json', 'w') as f:
-        json.dump(tasks, f, indent=4)
-
-    print(f"✅ Saved '{title}' as task number {new_id}")
-
+    for task_dict in data:
+        task = Task(**task_dict)
+        print(task)
 
 
     
