@@ -1,0 +1,9 @@
+[
+    {
+        "id": 1,
+        "title": "Feed Tom",
+        "description": "Pour Tom some milk",
+        "due_date": "2025-06-21",
+        "completed": false
+    }
+]
