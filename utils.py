@@ -19,7 +19,7 @@ def load_tasks():
 def generate_new_id(tasks):
     if not tasks:
         return 1
-    return max(task.id for task in tasks) + 1
+    return max(task['id'] for task in tasks) + 1
 
 def save_tasks(title, description, due_date):
     tasks = load_tasks()  
