@@ -11,7 +11,7 @@
         "title": "Cook a cow",
         "description": "Prepare a feastn for my in-laws",
         "due_date": "2025-06-21",
-        "completed": false
+        "completed": true
     },
     {
         "id": 3,

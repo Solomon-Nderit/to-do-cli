@@ -62,4 +62,27 @@ def load_tasks():
         print(task)
 
 
+def complete(id):
+    id=int(id)
+    with open('tasks.json') as f:
+        data = json.load(f)
+
     
+
+    found = False
+    for task in data:
+        if task['id'] == id:
+            task['completed'] = True
+            title = task['title']
+            found = True
+            break
+    
+    if not found:
+        print(f"❌ Task with ID {id} not found.")
+    #Save the updated task
+    with open("tasks.json","w") as f:
+        json.dump(data,f,indent=4)
+
+   
+    
+    print(f"✅Marked  '{title}' as complete")
