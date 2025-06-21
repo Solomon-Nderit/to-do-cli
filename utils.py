@@ -1,6 +1,8 @@
 import json
 from task import Task
 import os
+from datetime import datetime
+
 
 
 
@@ -64,10 +66,12 @@ def load_tasks():
 
 def complete(id):
     id=int(id)
-    with open('tasks.json') as f:
-        data = json.load(f)
-
-    
+    try:
+        with open('tasks.json') as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("❌ Could not load tasks.")
+        return
 
     found = False
     for task in data:
@@ -76,29 +80,26 @@ def complete(id):
             title = task['title']
             found = True
             break
-    
     if not found:
         print(f"❌ Task with ID {id} not found.")
-    #Save the updated task
-    with open("tasks.json","w") as f:
-        json.dump(data,f,indent=4)
-
-   
-    
-    print(f"✅Marked  '{title}' as complete")
+    else:
+        try:
+            with open("tasks.json","w") as f:
+                json.dump(data,f,indent=4)
+            print(f"✅Marked  '{title}' as complete")
+        except Exception as e:
+            print(f"❌ Error saving completed task: {e}")
 
 import json
 
 def delete(task_id):
     task_id = int(task_id)
-
     try:
         with open("tasks.json", "r") as f:
             data = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         print("❌ Could not load tasks.")
         return
-
     found = False
     for index, task in enumerate(data):
         if task["id"] == task_id:
@@ -106,13 +107,31 @@ def delete(task_id):
             del data[index]
             found = True
             break
-
     if not found:
         print(f"❌ Task with ID {task_id} not found.")
         return
+    try:
+        with open("tasks.json", "w") as f:
+            json.dump(data, f, indent=4)
+        print(f"✅ Deleted '{title}'")
+    except Exception as e:
+        print(f"❌ Error saving after delete: {e}")
 
-    with open("tasks.json", "w") as f:
-        json.dump(data, f, indent=4)
+def list_todays_tasks():
+    today=datetime.day()
+    try:
+        with open("tasks.json", "r") as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("❌ Could not load tasks.")
+        return
+    
+    for index, task in enumerate(data):
+        if task["due_date"] == today:
+            task = Task(**task)
+            print(task)
+            break
+        else:
+            print("No tasks due today😁")
 
-    print(f"✅ Deleted '{title}'")
 

@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, mock_open, MagicMock
 import os
 import json
-from utils import create_new_json, read_tasks, generate_new_id, save_tasks, load_tasks
+from utils import create_new_json, read_tasks, generate_new_id, save_tasks, load_tasks, complete, delete, list_todays_tasks
 
 class TestUtils(unittest.TestCase):
     @patch("os.path.exists", return_value=False)
@@ -47,6 +47,49 @@ class TestUtils(unittest.TestCase):
         with patch("builtins.print") as mock_print:
             load_tasks()
             mock_print.assert_any_call("No tasks to show.")
+
+    @patch("builtins.open", new_callable=mock_open, read_data='[{"id": 1, "title": "Test", "completed": false}]')
+    @patch("builtins.print")
+    def test_complete_found(self, mock_print, mock_file):
+        with patch("utils.Task"):
+            complete(1)
+            mock_print.assert_any_call("✅Marked  'Test' as complete")
+
+    @patch("builtins.open", new_callable=mock_open, read_data='[{"id": 2, "title": "Other"}]')
+    @patch("builtins.print")
+    def test_complete_not_found(self, mock_print, mock_file):
+        complete(1)
+        mock_print.assert_any_call("❌ Task with ID 1 not found.")
+
+    @patch("builtins.open", new_callable=mock_open, read_data='[{"id": 1, "title": "Test"}]')
+    @patch("builtins.print")
+    def test_delete_found(self, mock_print, mock_file):
+        delete(1)
+        mock_print.assert_any_call("✅ Deleted 'Test'")
+
+    @patch("builtins.open", new_callable=mock_open, read_data='[{"id": 2, "title": "Other"}]')
+    @patch("builtins.print")
+    def test_delete_not_found(self, mock_print, mock_file):
+        delete(1)
+        mock_print.assert_any_call("❌ Task with ID 1 not found.")
+
+    @patch("builtins.open", new_callable=mock_open, read_data='[{"id": 1, "title": "Test", "due_date": "2025-06-22"}]')
+    @patch("utils.Task")
+    @patch("builtins.print")
+    @patch("utils.datetime")
+    def test_list_todays_tasks_found(self, mock_datetime, mock_print, mock_task, mock_file):
+        mock_datetime.day.return_value = "2025-06-22"
+        list_todays_tasks()
+        mock_task.assert_called()
+        mock_print.assert_any_call(mock_task())
+
+    @patch("builtins.open", new_callable=mock_open, read_data='[{"id": 1, "title": "Test", "due_date": "2025-06-21"}]')
+    @patch("builtins.print")
+    @patch("utils.datetime")
+    def test_list_todays_tasks_not_found(self, mock_datetime, mock_print, mock_file):
+        mock_datetime.day.return_value = "2025-06-22"
+        list_todays_tasks()
+        mock_print.assert_any_call("No tasks due today😁")
 
 if __name__ == "__main__":
     unittest.main()
